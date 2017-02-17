@@ -163,8 +163,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         latitude = location.getLatitude();
         longitude = location.getLongitude();
         Log.i("MyLocation", Double.toString(latitude) + " " + Double.toString(longitude));
-        Toast.makeText(MainActivity.this.getBaseContext(), "MyLocation" + Double.toString(latitude) + " " + Double.toString(longitude), Toast.LENGTH_SHORT).show();
-
+        sendFloatPD("latitude",Float.parseFloat(Double.toString(latitude)));
+        sendFloatPD("longitude",Float.parseFloat(Double.toString(longitude)));
     }
 
     @Override
