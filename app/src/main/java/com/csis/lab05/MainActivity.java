@@ -38,8 +38,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private PdUiDispatcher dispatcher; //must declare this to use later, used to receive data from sendEvents
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
-    private double latitude;
-    private double longitude;
+
+    private double latitude = 100;
+    private double longitude = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +72,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         LocationManager mlocManager =
                 (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-
-        mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,this);
+        mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 300, 0,this);
     }
 
 
