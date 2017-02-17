@@ -43,13 +43,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private double longitude = 100;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);//Mandatory
         setContentView(R.layout.activity_main);//Mandatory
 
         super.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         //For declaring and initialising XML items, Always of form OBJECT_TYPE VARIABLE_NAME = (OBJECT_TYPE) findViewById(R.id.ID_SPECIFIED_IN_XML);
-        try { // try the code below, catch errors if things go wrong
+        try
+        { // try the code below, catch errors if things go wrong
             initPD(); //method is below to start PD
             loadPDPatch("synth.pd"); // This is the name of the patch in the zip
         } catch (IOException e) {
@@ -63,14 +65,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             return;
         }
 
-        LocationManager mlocManager =
-                (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 300, 0,this);
     }
@@ -78,10 +79,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
 
     @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
+    public void onSensorChanged(SensorEvent sensorEvent)
+    {
         Sensor mySensor = sensorEvent.sensor;
 
-    if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+        if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER)
+        {
 
             float x = sensorEvent.values[0];
             float y = sensorEvent.values[1];
@@ -103,20 +106,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     @Override //If screen is resumed
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
         PdAudio.startAudio(this);
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-
     }
 
 
     @Override//If we switch to other screen
-    protected void onPause() {
+    protected void onPause()
+    {
         super.onPause();
         PdAudio.stopAudio();
         mSensorManager.unregisterListener(this);
-
     }
 
     //METHOD TO SEND FLOAT TO PUREDATA PATCH
@@ -132,13 +135,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     //<---THIS METHOD LOADS SPECIFIED PATCH NAME----->
-    private void loadPDPatch(String patchName) throws IOException {
+    private void loadPDPatch(String patchName) throws IOException
+    {
         File dir = getFilesDir(); //Get current list of files in directory
-        try {
+        try
+        {
             IoUtils.extractZipResource(getResources().openRawResource(R.raw.synth), dir, true); //extract the zip file in raw called synth
             File pdPatch = new File(dir, patchName); //Create file pointer to patch
             PdBase.openPatch(pdPatch.getAbsolutePath()); //open patch
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
 
         }
     }
@@ -155,7 +161,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
 
     @Override
-    public void onLocationChanged(Location location) {
+    public void onLocationChanged(Location location)
+    {
         latitude = location.getLatitude();
         longitude = location.getLongitude();
         Log.i("MyLocation", Double.toString(latitude) + " " + Double.toString(longitude));
@@ -164,17 +171,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
+    public void onStatusChanged(String provider, int status, Bundle extras)
+    {
 
     }
 
     @Override
-    public void onProviderEnabled(String provider) {
+    public void onProviderEnabled(String provider)
+    {
 
     }
 
     @Override
-    public void onProviderDisabled(String provider) {
+    public void onProviderDisabled(String provider)
+    {
 
     }
 }
