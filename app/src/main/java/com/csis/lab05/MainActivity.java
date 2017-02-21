@@ -19,6 +19,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 //PURE DATA IMPORTS
@@ -33,25 +34,22 @@ import java.io.File;
 import java.io.IOException;
 
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener,LocationListener{
+public class MainActivity extends AppCompatActivity {
 
     private PdUiDispatcher dispatcher; //must declare this to use later, used to receive data from sendEvents
+
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
 
-    private double latitude = 100;
-    private double longitude = 100;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);//Mandatory
         setContentView(R.layout.activity_main);//Mandatory
 
         super.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         //For declaring and initialising XML items, Always of form OBJECT_TYPE VARIABLE_NAME = (OBJECT_TYPE) findViewById(R.id.ID_SPECIFIED_IN_XML);
-        try
-        { // try the code below, catch errors if things go wrong
+        try { // try the code below, catch errors if things go wrong
             initPD(); //method is below to start PD
             loadPDPatch("synth.pd"); // This is the name of the patch in the zip
         } catch (IOException e) {
@@ -59,67 +57,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             finish(); // end program
         }
 
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-            return;
-        }
-
-        LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 300, 0,this);
     }
 
-
-
-    @Override
-    public void onSensorChanged(SensorEvent sensorEvent)
-    {
-        Sensor mySensor = sensorEvent.sensor;
-
-        if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER)
-        {
-
-            float x = sensorEvent.values[0];
-            float y = sensorEvent.values[1];
-            float z = sensorEvent.values[2];
-
-          //  Log.i("ACCEL", "X:"+x + " Y:" + y + " Z:" + z);
-
-            sendFloatPD("accelX", x);
-            sendFloatPD("accelY", y);
-            sendFloatPD("accelZ", z);
-
-        }
-    }
-
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
 
     @Override //If screen is resumed
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
         PdAudio.startAudio(this);
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        //mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
 
     @Override//If we switch to other screen
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
         PdAudio.stopAudio();
-        mSensorManager.unregisterListener(this);
+       // mSensorManager.unregisterListener(this);
     }
 
     //METHOD TO SEND FLOAT TO PUREDATA PATCH
@@ -135,16 +88,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     //<---THIS METHOD LOADS SPECIFIED PATCH NAME----->
-    private void loadPDPatch(String patchName) throws IOException
-    {
+    private void loadPDPatch(String patchName) throws IOException {
         File dir = getFilesDir(); //Get current list of files in directory
-        try
-        {
+        try {
             IoUtils.extractZipResource(getResources().openRawResource(R.raw.synth), dir, true); //extract the zip file in raw called synth
             File pdPatch = new File(dir, patchName); //Create file pointer to patch
             PdBase.openPatch(pdPatch.getAbsolutePath()); //open patch
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
 
         }
     }
@@ -160,31 +110,4 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
 
-    @Override
-    public void onLocationChanged(Location location)
-    {
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
-        Log.i("MyLocation", Double.toString(latitude) + " " + Double.toString(longitude));
-        sendFloatPD("latitude",Float.parseFloat(Double.toString(latitude)));
-        sendFloatPD("longitude",Float.parseFloat(Double.toString(longitude)));
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras)
-    {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider)
-    {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider)
-    {
-
-    }
 }
